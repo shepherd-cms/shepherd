@@ -4,6 +4,7 @@ import { ErrorResponse } from "../../response/error";
 import { logger } from "../../../log";
 import { isNotString } from "../../../validation/guards";
 import { symbolKeys } from "../../constants";
+import { Password } from "../../../crypto/Password";
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers["authorization"];
@@ -46,7 +47,7 @@ export function verifyCreateUserParams(
   res: Response,
   next: NextFunction
 ) {
-  let { email, firstName, lastName, password } = req.body;
+  let { email, firstName, lastName, password: plaintext } = req.body;
 
   if (isNotString(email)) {
     let error = new ErrorResponse({
@@ -75,9 +76,20 @@ export function verifyCreateUserParams(
     return;
   }
 
-  if (isNotString(password)) {
+  if (isNotString(plaintext)) {
     let error = new ErrorResponse({
       error: `Password is required`,
+      status: ErrorResponse.BadRequest,
+    });
+    error.send(res);
+    return;
+  }
+
+  let password = new Password(plaintext);
+  let pwAudit = password.audit();
+  if (pwAudit.is_err()) {
+    let error = new ErrorResponse({
+      error: pwAudit.unwrap_err(),
       status: ErrorResponse.BadRequest,
     });
     error.send(res);

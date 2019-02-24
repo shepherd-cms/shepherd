@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import { getConnection, getManager } from "typeorm";
 import User from "../../../models/user";
 import * as jwt from "jsonwebtoken";
@@ -7,6 +6,8 @@ import { ErrorResponse } from "../../response/error";
 import { OkResponse } from "../../response/ok";
 import { logger } from "../../../log";
 import { durationTo, Duration } from "../../../time/time";
+import { Password } from "../../../crypto/Password";
+import { isNotString } from "../../../validation/guards";
 
 export interface SignUpParams {
   email: string;
@@ -22,7 +23,7 @@ export interface SignUpParams {
  * Creates a new Shepherd user.
  */
 export async function createNewUser(params: SignUpParams): Promise<HttpSender> {
-  let { email, firstName, lastName, password } = params;
+  let { email, firstName, lastName, password: plaintext } = params;
 
   const hasUser = await getManager()
     .createQueryBuilder(User, "user")
@@ -37,9 +38,8 @@ export async function createNewUser(params: SignUpParams): Promise<HttpSender> {
     });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  logger.debug({ hashedPassword });
-
+  let password = new Password(plaintext);
+  const hashedPassword = await password.mustHash();
   // create new user
   const user = await getConnection()
     .createQueryBuilder()
@@ -54,6 +54,7 @@ export async function createNewUser(params: SignUpParams): Promise<HttpSender> {
       },
     ])
     .execute();
+
   logger.debug({ user });
 
   return OkResponse.NewCreated();
@@ -73,16 +74,16 @@ export interface LoginParams {
  * succeeds, returns a json web token and a basic user object.
  */
 export async function loginUser(params: LoginParams): Promise<HttpSender> {
-  let { email, password } = params;
+  let { email, password: plaintext } = params;
 
-  if (!email) {
+  if (isNotString(email)) {
     return new ErrorResponse({
       error: `Email is required`,
       status: ErrorResponse.BadRequest,
     });
   }
 
-  if (!password) {
+  if (isNotString(plaintext)) {
     return new ErrorResponse({
       error: `Password is required`,
       status: ErrorResponse.BadRequest,
@@ -91,22 +92,23 @@ export async function loginUser(params: LoginParams): Promise<HttpSender> {
 
   const user = await getManager()
     .createQueryBuilder(User, "user")
-    .where("user.email = :email", { email: email })
+    .where("user.email = :email", { email })
     .getOne();
 
   if (!user) {
     return new ErrorResponse({
       error: "No user exists with that email",
-      metadata: { email: email },
+      metadata: { email },
       status: ErrorResponse.BadRequest,
     });
   }
 
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  let password = new Password(plaintext);
+  const isPasswordMatch = await password.mustCompare(user.password);
   if (!isPasswordMatch) {
     return new ErrorResponse({
       error: "Password is incorrect",
-      metadata: { email: email },
+      metadata: { email },
       status: ErrorResponse.BadRequest,
     });
   }
