@@ -3,6 +3,7 @@ import * as Auth from "./auth.controller";
 import { ErrorResponse } from "../../response/error";
 import { logger } from "../../../log";
 import { isNotString } from "../../../validation/validation";
+import { requestKeys } from "../../constants";
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers["authorization"];
