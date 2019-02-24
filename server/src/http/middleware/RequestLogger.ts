@@ -30,7 +30,7 @@ export class RequestLog {
     response: Response,
     options: RequestLogOptions = {}
   ) {
-    let { withColors = true } = options;
+    let { withColors = false } = options;
     this.withColors = withColors;
 
     response.on("finish", this.onFinish);
