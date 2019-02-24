@@ -30,6 +30,10 @@ export class ConsoleLogger implements Logger {
       return;
     }
     console.error(this.prefix("fatal"), ...values);
+    /**
+     * A fatal log is expected to terminate execution after logging its message.
+     */
+    process.exit(1);
   };
 
   error = (...values: any[]) => {
@@ -58,12 +62,5 @@ export class ConsoleLogger implements Logger {
       return;
     }
     console.debug(this.prefix("debug"), ...values);
-  };
-
-  trace = (...values: any[]) => {
-    if (!levelSatisfies(this.level, LogLevel.Trace)) {
-      return;
-    }
-    console.trace(this.prefix("trace"), ...values);
   };
 }
