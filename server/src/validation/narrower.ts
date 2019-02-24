@@ -93,6 +93,6 @@ export const asInstanceOf: <Constructor extends new (...args: any[]) => any>(
       Some: Result.Ok,
     });
 
-export function expectNever(_: never): never {
-  throw new TypeError(`Invariant violation`);
+export function expectNever(_: never, message = `Invariant violation`): never {
+  throw new TypeError(message);
 }

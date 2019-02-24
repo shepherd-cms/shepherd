@@ -1,6 +1,5 @@
 import { LogLevel, Logger, levelSatisfies } from "./log.interface";
-
-const padZero = (n: number) => n.toString().padStart(2, "0");
+import { padZero } from "../number/number";
 
 /**
  * ConsoleLogger is an implementation of the Logger interface that just
