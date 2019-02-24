@@ -49,11 +49,11 @@ export function format(
 
   if (useBinary) {
     /* spell-checker: disable */
-    return `${bytes.toFixed(precision)}${"KMGTPEZY"[u]}iB`;
+    return `${bytes.toFixed(precision)}${" KMGTPEZY"[u]}iB`;
   }
 
   /* spell-checker: disable */
-  return `${bytes.toFixed(precision)}${"KMGTPEZY"[u]}B`;
+  return `${bytes.toFixed(precision)}${" KMGTPEZY"[u]}B`;
 }
 
 export function toBytes(b: number, unit: ByteType) {
