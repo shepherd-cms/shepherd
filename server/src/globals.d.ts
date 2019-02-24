@@ -1,0 +1,1 @@
+/* A place to declare global types */

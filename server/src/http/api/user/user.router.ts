@@ -1,11 +1,14 @@
-import { Router } from 'express';
-import * as Controller from './user.controller';
+import { Router } from "express";
+import * as Controller from "./user.controller";
+import { logger } from "../../../log";
+import { requestKeys } from "../../constants";
 
 export const router = Router();
 
-router.get('/', async (req: any, res: any) => {
+router.get("/self", async (req: any, res: any) => {
+  let userId = req[requestKeys.userId];
+  logger.debug({ userId });
 
-  const allUsers = await Controller.fetchAllUsers();
-  console.log('ere', allUsers);
-  res.send(allUsers)
-})
+  const sender = await Controller.fetchUserById(userId);
+  sender.send(res);
+});
