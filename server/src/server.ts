@@ -1,3 +1,4 @@
+import "./bootstrap";
 import express from "express";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
