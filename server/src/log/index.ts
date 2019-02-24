@@ -6,8 +6,11 @@ let manager = new LogManager(LogLevel.All);
 
 switch (process.env.NODE_ENV) {
   case "production":
+    manager.setLevel(
+      LogLevel.Fatal | LogLevel.Error | LogLevel.Warn | LogLevel.Info
+    );
     manager.add(
-      new ConsoleLogger(LogLevel.Error | LogLevel.Info, {
+      new ConsoleLogger(LogLevel.Error | LogLevel.Warn | LogLevel.Info, {
         stream: process.stderr,
         newLine: NewLine.LF,
       })

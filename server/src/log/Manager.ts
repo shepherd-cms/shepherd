@@ -14,8 +14,14 @@ export class LogManager implements Logger {
     this.loggers.push(...loggers);
   }
 
-  add(logger: Logger) {
+  add(logger: Logger): this {
     this.loggers.push(logger);
+    return this;
+  }
+
+  setLevel(level: number): this {
+    this.level = level;
+    return this;
   }
 
   fatal = (...values: any[]) => {
