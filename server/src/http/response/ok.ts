@@ -1,6 +1,6 @@
 import { ResponseMetadata, HttpSender } from "./response.interface";
 import { Response, Request } from "express";
-import { requestKeys } from "../constants";
+import { RequestId } from "../RequestId";
 
 export interface OkResponseParams {
   req?: Request;
@@ -27,14 +27,15 @@ export class OkResponse<T> implements HttpSender {
 
   send(res: Response) {
     let { data, ok, metadata, status } = this;
+    let requestId = RequestId.extract(res).toString();
     res.status(status);
+    res.setHeader("X-Request-ID", requestId);
     res.json({
       ok,
       data,
       metadata: {
         ...metadata,
-        // @ts-ignore
-        requestId: res[requestKeys.requestId],
+        requestId,
       },
     });
   }

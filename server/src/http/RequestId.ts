@@ -33,6 +33,11 @@ export class RequestId {
     next();
   }
 
+  static extract(reqOrRes: Request | Response): RequestId {
+    // @ts-ignore
+    return reqOrRes[requestKeys.requestId];
+  }
+
   private static hostname = os.hostname() || "localhost";
   private static prefix = `${RequestId.hostname}/${RequestId.startupGuid()}`;
   private static id = 0;
