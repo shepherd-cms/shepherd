@@ -47,10 +47,11 @@ export class RequestId {
     // Generate a random base64 string, but reduce it to base 62.
     // This will likely only run once, but if our 2 unwanted chars
     // take up much of our string, this needs to rerun.
+    let replacer = /[\+\/]/g;
     while (b64.length < 10) {
       b64 = randomBytes(12)
         .toString("base64")
-        .replace(/\+\//g, "");
+        .replace(replacer, "");
     }
 
     return b64;
