@@ -149,7 +149,7 @@ export interface TokenMetadata {
 }
 
 interface JwtPayload {
-  id: number;
+  id: string;
 }
 
 /**

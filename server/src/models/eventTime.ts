@@ -5,7 +5,7 @@ import Campus from "./campus";
 @Entity()
 export default class EventTime {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   startDate: string;

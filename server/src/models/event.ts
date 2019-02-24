@@ -4,7 +4,7 @@ import EventTime from "./eventTime";
 @Entity()
 export default class Event {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   name: string;

@@ -4,7 +4,7 @@ import Campus from "./campus";
 @Entity()
 export default class Property {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column()
   name: string;
