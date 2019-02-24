@@ -16,6 +16,9 @@ export function requestLogger(
 
 export function withTimeout(timeoutDuration: number): Handler {
   return function timeoutHandler(req, _res, next) {
+    /**
+     * @link https://nodejs.org/dist/latest-v10.x/docs/api/net.html#net_socket_settimeout_timeout_callback
+     */
     req.setTimeout(timeoutDuration, () => {
       logger.error(
         new TimeoutError({
