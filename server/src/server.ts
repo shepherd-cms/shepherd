@@ -5,7 +5,8 @@ import { createConnection } from "typeorm";
 import * as Api from "./http/api/api";
 import { logger } from "./log";
 import bodyParser from "body-parser";
-import { requestLogger } from "./http/middleware/general";
+import * as middleware from "./http/middleware/general";
+import { Duration } from "./time/time";
 
 // create postgres connection
 createConnection();
@@ -15,7 +16,8 @@ const port = 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(requestLogger);
+app.use(middleware.requestLogger);
+app.use(middleware.withTimeout(Duration.Second * 30));
 app.get("/test", (_req: any, res: any) => {
   res.send("hello world");
 });
