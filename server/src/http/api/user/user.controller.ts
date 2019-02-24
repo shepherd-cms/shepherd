@@ -1,10 +1,13 @@
-import { getManager } from 'typeorm';
-import { ErrorResponse } from '../../response/error';
-import User from '../../../models/user';
-import { ResponseWriter } from '../../response/response.interface';
-import { OkResponse } from '../../response/ok';
+import { getManager } from "typeorm";
+import { ErrorResponse } from "../../response/error";
+import User from "../../../models/user";
+import { HttpSender } from "../../response/response.interface";
+import { OkResponse } from "../../response/ok";
 
-export async function fetchUserById(userId: string): Promise<ResponseWriter> {
+/**
+ * Returns a user from the database.
+ */
+export async function fetchUserById(userId: number): Promise<HttpSender> {
   if (!userId) {
     return new ErrorResponse({
       error: `User Id is required`,
@@ -13,8 +16,8 @@ export async function fetchUserById(userId: string): Promise<ResponseWriter> {
   }
 
   const user = await getManager()
-    .createQueryBuilder(User, 'user')
-    .where('user.id = :id', { id: userId })
+    .createQueryBuilder(User, "user")
+    .where("user.id = :id", { id: userId })
     .getOne();
 
   return new OkResponse({

@@ -1,13 +1,13 @@
-import { ResponseMetadata } from './response.interface';
-import { Response, Request } from 'express';
+import { ResponseMetadata, HttpSender } from "./response.interface";
+import { Response, Request } from "express";
 
-export type OkResponseParams = {
+export interface OkResponseParams {
   req?: Request;
   status?: number;
   metadata?: { [k: string]: any };
-};
+}
 
-export class OkResponse<T> {
+export class OkResponse<T> implements HttpSender {
   readonly ok = true;
   status: number;
   data: T;
@@ -24,7 +24,7 @@ export class OkResponse<T> {
     };
   }
 
-  render(res: Response) {
+  send(res: Response) {
     let { data, ok, metadata, status } = this;
     res.status(status);
     res.json({ data, metadata, ok });

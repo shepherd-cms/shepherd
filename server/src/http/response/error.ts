@@ -1,5 +1,5 @@
-import { ResponseMetadata } from './response.interface';
-import { Response, Request } from 'express';
+import { ResponseMetadata, HttpSender } from "./response.interface";
+import { Response, Request } from "express";
 
 export interface ErrorResponseParams {
   req?: Request;
@@ -8,7 +8,7 @@ export interface ErrorResponseParams {
   metadata?: { [k: string]: any };
 }
 
-export class ErrorResponse {
+export class ErrorResponse implements HttpSender {
   readonly ok = false;
   status: number;
   error: string;
@@ -21,7 +21,7 @@ export class ErrorResponse {
   constructor(params: ErrorResponseParams) {
     let {
       status = ErrorResponse.BadRequest,
-      error = 'Bad Request',
+      error = "Bad Request",
       req,
       metadata,
     } = params;
@@ -38,7 +38,7 @@ export class ErrorResponse {
   /**
    * Router call should this.
    */
-  render(res: Response) {
+  send(res: Response) {
     let { error, metadata, ok, status } = this;
     res.status(status);
     res.json({ error, metadata, ok });
@@ -57,6 +57,14 @@ export class ErrorResponse {
       error: `Not Found`,
       req,
       status: ErrorResponse.NotFound,
+    });
+  }
+
+  static NewUnauthorizedError(req?: Request): ErrorResponse {
+    return new ErrorResponse({
+      error: `Unauthorized`,
+      req,
+      status: ErrorResponse.Unauthorized,
     });
   }
 

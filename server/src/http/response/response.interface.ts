@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response } from "express";
 
 export interface ResponseMetadata {
   datetime: string;
@@ -7,6 +7,6 @@ export interface ResponseMetadata {
   [k: string]: any;
 }
 
-export interface ResponseWriter {
-  render(res: Response): any;
+export interface HttpSender {
+  send(res: Response): any;
 }
