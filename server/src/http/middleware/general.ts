@@ -3,7 +3,7 @@ import { logger } from "../../log";
 import { TimeoutError } from "../errors/TimeoutError";
 import { RequestId } from "../RequestId";
 
-export const withRequestId = RequestId.inject;
+export const withRequestId = RequestId.injectMiddleware;
 
 export function requestLogger(
   req: Request,

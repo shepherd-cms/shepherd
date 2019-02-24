@@ -24,7 +24,7 @@ export class RequestId {
     return this.toString();
   }
 
-  static inject(req: Request, res: Response, next: NextFunction) {
+  static injectMiddleware(req: Request, res: Response, next: NextFunction) {
     let reqId = new RequestId();
     // @ts-ignore
     req[symbolKeys.requestId] = reqId;
