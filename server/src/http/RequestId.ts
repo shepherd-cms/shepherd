@@ -54,6 +54,6 @@ export class RequestId {
         .replace(replacer, "");
     }
 
-    return b64;
+    return b64.slice(0, 10);
   }
 }
