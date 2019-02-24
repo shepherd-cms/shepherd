@@ -14,7 +14,8 @@
   },
   "author": "Mike Havrilla",
   "contributors": [
-    "Alex Regan <alex@alexregan.com>"
+    "Alex Regan <alex@alexregan.com>",
+    "Mike Havrilla <mike.havrill@gmail.com>"
   ],
   "license": "MIT",
   "dependencies": {
