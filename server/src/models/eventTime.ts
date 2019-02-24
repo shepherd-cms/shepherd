@@ -1,29 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
-import Event from './Event';
-import Campus from './campus';
-
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import Event from "./event";
+import Campus from "./campus";
 
 @Entity()
 export default class EventTime {
+  @PrimaryGeneratedColumn("uuid")
+  id: number;
 
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+  @Column()
+  startDate: string;
 
-    @Column()
-    startDate: string;
+  @Column()
+  endDate: string;
 
-    @Column()
-    endDate: string;
+  @Column()
+  startTime: string;
 
-    @Column()
-    startTime: string;
+  @Column()
+  endTime: string;
 
-    @Column()
-    endTime: string;
+  @ManyToOne((_type) => Campus, (campus) => campus.eventTimes)
+  campus: Campus;
 
-    @ManyToOne(type => Campus, campus => campus.eventTimes)
-    campus: Campus;
-
-    @ManyToOne(type => Event, event => event.eventTimes)
-    event: Event;
+  @ManyToOne((_type) => Event, (event) => event.eventTimes)
+  event: Event;
 }

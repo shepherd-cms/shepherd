@@ -1,18 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import Campus from "./campus";
 
 @Entity()
 export default class Property {
+  @PrimaryGeneratedColumn("uuid")
+  id: number;
 
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+  @Column()
+  name: string;
 
-    @Column()
-    name: string;
+  @Column()
+  address: number;
 
-    @Column()
-    address: number;
-
-    @ManyToOne(type => Campus, campus => campus.property)
-    campus: Campus; 
+  @ManyToOne((_type) => Campus, (campus) => campus.property)
+  campus: Campus;
 }
