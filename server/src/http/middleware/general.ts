@@ -1,11 +1,13 @@
 import { Handler } from "express";
-import { RequestLog } from "./RequestLogger";
+import { RequestLog, NewLine } from "./RequestLogger";
 import { RequestId } from "../RequestId";
 
 export const withRequestId = RequestId.injectMiddleware;
 
 export const requestLogger = RequestLog.middleware({
+  newLine: NewLine.LF,
   withColors: true,
+  // We'll use stdout for request logs, and stderr for application logs.
   stream: process.stdout,
 });
 

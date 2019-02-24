@@ -3,9 +3,21 @@ import chalk from "chalk";
 import { LogLevel, Logger, levelSatisfies, LogLabel } from "./log.interface";
 import { padZero } from "../number/number";
 
+export const enum NewLine {
+  /**
+   * Linux/Mac style new line.
+   */
+  LF = "\n",
+  /**
+   * Windows style new line.
+   */
+  CRLF = "\r\n",
+}
+
 export interface ConsoleLoggerOptions {
   withColor?: boolean;
   stream?: NodeJS.WriteStream;
+  newLine?: NewLine;
 }
 
 /**
@@ -15,6 +27,7 @@ export interface ConsoleLoggerOptions {
  * around managing context for `this`.
  */
 export class ConsoleLogger implements Logger {
+  newLine: NewLine;
   withColor: boolean;
   stream: NodeJS.WriteStream;
   colorizers = {
@@ -33,9 +46,14 @@ export class ConsoleLogger implements Logger {
   };
 
   constructor(protected level: number, options: ConsoleLoggerOptions = {}) {
-    let { withColor = false, stream = process.stderr } = options;
+    let {
+      withColor = false,
+      stream = process.stderr,
+      newLine = NewLine.LF,
+    } = options;
     this.withColor = withColor;
     this.stream = stream;
+    this.newLine = newLine;
   }
 
   protected write(label: LogLabel, ...values: any[]) {
@@ -46,7 +64,7 @@ export class ConsoleLogger implements Logger {
     } else {
       this.stream.write(util.format(this.prefix(label), ...values));
     }
-    this.stream.write("\n");
+    this.stream.write(this.newLine);
   }
 
   protected prefix(label: LogLabel): string {

@@ -7,9 +7,21 @@ import * as time from "../../time/time";
 import { parseIntStrict, padZero } from "../../number/number";
 import * as bytes from "../../bytes/bytes";
 
+export const enum NewLine {
+  /**
+   * Linux/Mac style new line.
+   */
+  LF = "\n",
+  /**
+   * Windows style new line.
+   */
+  CRLF = "\r\n",
+}
+
 export interface RequestLogOptions {
   withColors?: boolean;
   stream?: NodeJS.WriteStream;
+  newLine?: NewLine;
 }
 
 export class RequestLog {
@@ -25,7 +37,7 @@ export class RequestLog {
   protected contentLength = "0";
   protected response: Response;
   protected withColors: boolean;
-
+  protected newLine: NewLine;
   protected stream: NodeJS.WriteStream;
 
   constructor(
@@ -33,9 +45,14 @@ export class RequestLog {
     response: Response,
     options: RequestLogOptions = {}
   ) {
-    let { withColors = false, stream = process.stderr } = options;
+    let {
+      withColors = false,
+      stream = process.stderr,
+      newLine = NewLine.LF,
+    } = options;
     this.withColors = withColors;
     this.stream = stream;
+    this.newLine = newLine;
 
     response.on("finish", this.onFinish);
     this.response = response;
@@ -45,6 +62,17 @@ export class RequestLog {
     this.setIpAddr(request);
     this.requestId = RequestId.extract(request);
   }
+
+  onFinish = () => {
+    this.stopTime();
+    this.statusCode = this.response.statusCode;
+    let contentLength = this.response.getHeader("content-length");
+    if (isString(contentLength) || isNumber(contentLength)) {
+      this.contentLength = String(contentLength);
+    }
+
+    this.stream.write(this.format() + this.newLine);
+  };
 
   format(): string {
     let { method, uri, httpVersion, ipAddr } = this;
@@ -69,7 +97,6 @@ export class RequestLog {
       elapsed = chalk.green(elapsed);
     }
 
-    // $date $time [$machine-name/$request-id] "$METHOD $URI $HTTP_VERSION" from $IP_ADDR - $STATUS_CODE $CONTENT_LENGTH in $TIME
     return `${dt} ${reqId} ${quote}${method} ${uri} ${httpVersion}${quote} from ${ipAddr} - ${statusCode} ${size} in ${elapsed}`;
   }
 
@@ -92,17 +119,6 @@ export class RequestLog {
 
     return `${YYYY}/${MM}/${DD} ${hh}:${mm}:${ss}`;
   }
-
-  onFinish = () => {
-    this.stopTime();
-    this.statusCode = this.response.statusCode;
-    let contentLength = this.response.getHeader("content-length");
-    if (isString(contentLength) || isNumber(contentLength)) {
-      this.contentLength = String(contentLength);
-    }
-
-    this.stream.write(this.format() + "\n");
-  };
 
   setIpAddr(request: Request): this {
     // Simplest access from the actual socket.
@@ -131,7 +147,7 @@ export class RequestLog {
     return this;
   }
 
-  static middleware(options?: RequestLogOptions): Handler {
+  static middleware(options: RequestLogOptions): Handler {
     return function requestLogHandler(req, res, next) {
       new RequestLog(req, res, options);
       next();
