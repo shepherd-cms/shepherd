@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import * as os from "os";
 import { Request, Response, NextFunction } from "express";
-import { requestKeys } from "./constants";
+import { symbolKeys } from "./constants";
 
 // RequestID is a middleware that injects a request ID into the context of each
 // request. A request ID is a string of the form "host.example.com/random-0001",
@@ -27,15 +27,15 @@ export class RequestId {
   static inject(req: Request, res: Response, next: NextFunction) {
     let reqId = new RequestId();
     // @ts-ignore
-    req[requestKeys.requestId] = reqId;
+    req[symbolKeys.requestId] = reqId;
     // @ts-ignore
-    res[requestKeys.requestId] = reqId;
+    res[symbolKeys.requestId] = reqId;
     next();
   }
 
   static extract(reqOrRes: Request | Response): RequestId {
     // @ts-ignore
-    return reqOrRes[requestKeys.requestId];
+    return reqOrRes[symbolKeys.requestId];
   }
 
   private static hostname = os.hostname() || "localhost";

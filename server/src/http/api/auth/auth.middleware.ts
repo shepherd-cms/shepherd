@@ -3,7 +3,7 @@ import * as Auth from "./auth.controller";
 import { ErrorResponse } from "../../response/error";
 import { logger } from "../../../log";
 import { isNotString } from "../../../validation/guards";
-import { requestKeys } from "../../constants";
+import { symbolKeys } from "../../constants";
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers["authorization"];
@@ -24,7 +24,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
   Auth.verifyToken(token)
     .then((decodedToken: any) => {
       // @ts-ignore because apparently we can't index symbols yet
-      req[requestKeys.userId] = decodedToken.id;
+      req[symbolKeys.userId] = decodedToken.id;
       next();
     })
     .catch((err: any) => {
