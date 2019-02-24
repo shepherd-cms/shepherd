@@ -9,10 +9,11 @@ import * as bytes from "../../bytes/bytes";
 
 export interface RequestLogOptions {
   withColors?: boolean;
+  stream?: NodeJS.WriteStream;
 }
 
 export class RequestLog {
-  protected begin = new Date();
+  protected incomingDate = new Date();
   protected start = performance.now();
   protected end = 0;
   protected uri = "";
@@ -25,13 +26,16 @@ export class RequestLog {
   protected response: Response;
   protected withColors: boolean;
 
+  protected stream: NodeJS.WriteStream;
+
   constructor(
     request: Request,
     response: Response,
     options: RequestLogOptions = {}
   ) {
-    let { withColors = false } = options;
+    let { withColors = false, stream = process.stderr } = options;
     this.withColors = withColors;
+    this.stream = stream;
 
     response.on("finish", this.onFinish);
     this.response = response;
@@ -50,7 +54,7 @@ export class RequestLog {
       useBinary: false,
       precision: 1,
     });
-    let dt = this.fmtDate(this.begin);
+    let dt = this.fmtDate(this.incomingDate);
     let reqId = `[${this.requestId}]`;
     let quote = `"`;
 
@@ -97,7 +101,7 @@ export class RequestLog {
       this.contentLength = String(contentLength);
     }
 
-    process.stderr.write(this.format() + "\n");
+    this.stream.write(this.format() + "\n");
   };
 
   setIpAddr(request: Request): this {

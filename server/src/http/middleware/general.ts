@@ -6,6 +6,7 @@ export const withRequestId = RequestId.injectMiddleware;
 
 export const requestLogger = RequestLog.middleware({
   withColors: true,
+  stream: process.stdout,
 });
 
 export function withTimeout(timeoutDuration: number): Handler {
