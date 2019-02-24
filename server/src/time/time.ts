@@ -29,6 +29,25 @@ export const durationTo = {
   /* Years no implemented because of leap years */
 };
 
+export function stringify(duration: number): string {
+  switch (true) {
+    default:
+      return `${durationTo.week(duration).toFixed(2)}wk`;
+    case duration < Duration.Millisecond:
+      return `${durationTo.microsecond(duration).toFixed(2)}µs`;
+    case duration < Duration.Second:
+      return `${duration.toFixed(2)}ms`;
+    case duration < Duration.Minute:
+      return `${durationTo.second(duration).toFixed(2)}sec`;
+    case duration < Duration.Hour:
+      return `${durationTo.minute(duration).toFixed(2)}min`;
+    case duration < Duration.Day:
+      return `${durationTo.hour(duration).toFixed(2)}hr`;
+    case duration < Duration.Week:
+      return `${durationTo.day(duration).toFixed(2)}day`;
+  }
+}
+
 /**
  * Resolves the given Promise, but throws a TimeoutError if the timeout is
  * reached before the Promise is resolved. Uses the optional message for the
