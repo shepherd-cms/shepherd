@@ -14,9 +14,10 @@ createConnection();
 const app = express();
 const port = 3000;
 
+app.use(middleware.withRequestId);
+app.use(middleware.requestLogger);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(middleware.requestLogger);
 app.use(middleware.withTimeout(Duration.Second * 30));
 app.get("/test", (_req: any, res: any) => {
   res.send("hello world");

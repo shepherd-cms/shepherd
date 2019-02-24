@@ -1,5 +1,6 @@
 import { ResponseMetadata, HttpSender } from "./response.interface";
 import { Response, Request } from "express";
+import { requestKeys } from "../constants";
 
 export interface ErrorResponseParams {
   req?: Request;
@@ -41,7 +42,15 @@ export class ErrorResponse implements HttpSender {
   send(res: Response) {
     let { error, metadata, ok, status } = this;
     res.status(status);
-    res.json({ error, metadata, ok });
+    res.json({
+      ok,
+      error,
+      metadata: {
+        ...metadata,
+        // @ts-ignore
+        requestId: res[requestKeys.requestId],
+      },
+    });
   }
 
   static NewInternalServerError(req?: Request): ErrorResponse {

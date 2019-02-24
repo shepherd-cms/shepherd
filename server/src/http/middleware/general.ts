@@ -1,6 +1,9 @@
 import { Response, Request, NextFunction, Handler } from "express";
 import { logger } from "../../log";
 import { TimeoutError } from "../errors/TimeoutError";
+import { RequestId } from "../RequestId";
+
+export const withRequestId = RequestId.inject;
 
 export function requestLogger(
   req: Request,
