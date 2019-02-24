@@ -26,7 +26,7 @@ export interface ConsoleLoggerOptions {
  * properties so that all callers need not concern themselves with gotchas
  * around managing context for `this`.
  */
-export class ConsoleLogger implements Logger {
+export class StreamLogger implements Logger {
   newLine: NewLine;
   withColor: boolean;
   stream: NodeJS.WriteStream;

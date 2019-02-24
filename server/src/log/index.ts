@@ -1,5 +1,5 @@
 import { LogLevel, Logger } from "./log.interface";
-import { ConsoleLogger, NewLine } from "./Console";
+import { StreamLogger, NewLine } from "./StreamLogger";
 import { LogManager } from "./Manager";
 
 let manager = new LogManager(LogLevel.All);
@@ -10,7 +10,7 @@ switch (process.env.NODE_ENV) {
       LogLevel.Fatal | LogLevel.Error | LogLevel.Warn | LogLevel.Info
     );
     manager.add(
-      new ConsoleLogger(LogLevel.Error | LogLevel.Warn | LogLevel.Info, {
+      new StreamLogger(LogLevel.Error | LogLevel.Warn | LogLevel.Info, {
         stream: process.stderr,
         newLine: NewLine.LF,
       })
@@ -19,7 +19,7 @@ switch (process.env.NODE_ENV) {
 
   default:
     manager.add(
-      new ConsoleLogger(LogLevel.All, {
+      new StreamLogger(LogLevel.All, {
         stream: process.stderr,
         withColor: true,
         newLine: NewLine.LF,
