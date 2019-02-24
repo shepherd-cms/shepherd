@@ -1,5 +1,12 @@
-import { LogLevel, Logger, levelSatisfies } from "./log.interface";
+import * as util from "util";
+import chalk from "chalk";
+import { LogLevel, Logger, levelSatisfies, LogLabel } from "./log.interface";
 import { padZero } from "../number/number";
+
+export interface ConsoleLoggerOptions {
+  withColor?: boolean;
+  stream?: NodeJS.WriteStream;
+}
 
 /**
  * ConsoleLogger is an implementation of the Logger interface that just
@@ -8,9 +15,41 @@ import { padZero } from "../number/number";
  * around managing context for `this`.
  */
 export class ConsoleLogger implements Logger {
-  constructor(private level: number) {}
+  withColor: boolean;
+  stream: NodeJS.WriteStream;
+  colorizers = {
+    [LogLabel.Fatal]: chalk.red,
+    [LogLabel.Error]: chalk.red,
+    [LogLabel.Warn]: chalk.yellow,
+    [LogLabel.Info]: chalk.cyan,
+    [LogLabel.Debug]: chalk.white,
+  };
+  bgColorizers = {
+    [LogLabel.Fatal]: chalk.bgRed,
+    [LogLabel.Error]: chalk.bgRed,
+    [LogLabel.Warn]: chalk.bgYellow,
+    [LogLabel.Info]: chalk.bgCyan,
+    [LogLabel.Debug]: chalk.bgWhite,
+  };
 
-  private prefix(name: string): string {
+  constructor(protected level: number, options: ConsoleLoggerOptions = {}) {
+    let { withColor = false, stream = process.stderr } = options;
+    this.withColor = withColor;
+    this.stream = stream;
+  }
+
+  protected write(label: LogLabel, ...values: any[]) {
+    if (this.withColor) {
+      this.stream.write(
+        this.colorizers[label](util.format(this.prefix(label), ...values))
+      );
+    } else {
+      this.stream.write(util.format(this.prefix(label), ...values));
+    }
+    this.stream.write("\n");
+  }
+
+  protected prefix(label: LogLabel): string {
     let d = new Date();
 
     let YYYY = d.getFullYear();
@@ -21,14 +60,29 @@ export class ConsoleLogger implements Logger {
     let mm = padZero(d.getMinutes());
     let ss = padZero(d.getSeconds());
 
-    return `${YYYY}/${MM}/${DD} ${hh}:${mm}:${ss} [${name}]`;
+    let labelFmt = `[${label.toUpperCase()}]`;
+    if (this.withColor) {
+      labelFmt = chalk.bold(labelFmt);
+      let colorizer = this.bgColorizers[label];
+      switch (label) {
+        case LogLabel.Debug:
+        case LogLabel.Info:
+          labelFmt = colorizer(chalk.black(labelFmt));
+          break;
+        default:
+          labelFmt = colorizer(chalk.whiteBright(labelFmt));
+          break;
+      }
+    }
+
+    return `${labelFmt} [${YYYY}/${MM}/${DD} ${hh}:${mm}:${ss}]`;
   }
 
   fatal = (...values: any[]) => {
     if (!levelSatisfies(this.level, LogLevel.Fatal)) {
       return;
     }
-    console.error(this.prefix("fatal"), ...values);
+    this.write(LogLabel.Fatal, ...values);
     /**
      * A fatal log is expected to terminate execution after logging its message.
      */
@@ -39,27 +93,27 @@ export class ConsoleLogger implements Logger {
     if (!levelSatisfies(this.level, LogLevel.Error)) {
       return;
     }
-    console.error(this.prefix("error"), ...values);
+    this.write(LogLabel.Error, ...values);
   };
 
   warn = (...values: any[]) => {
     if (!levelSatisfies(this.level, LogLevel.Warn)) {
       return;
     }
-    console.warn(this.prefix("warn"), ...values);
+    this.write(LogLabel.Warn, ...values);
   };
 
   info = (...values: any[]) => {
     if (!levelSatisfies(this.level, LogLevel.Info)) {
       return;
     }
-    console.info(this.prefix("info"), ...values);
+    this.write(LogLabel.Info, ...values);
   };
 
   debug = (...values: any[]) => {
     if (!levelSatisfies(this.level, LogLevel.Debug)) {
       return;
     }
-    console.debug(this.prefix("debug"), ...values);
+    this.write(LogLabel.Debug, ...values);
   };
 }

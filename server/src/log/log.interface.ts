@@ -83,6 +83,13 @@ export const enum LogLevel {
     LogLevel.Info |
     LogLevel.Debug,
 }
+export const enum LogLabel {
+  Fatal = "fatal",
+  Error = "error",
+  Warn = "warn",
+  Info = "info",
+  Debug = "debug",
+}
 
 /**
  * Implements the boolean logic to extract and compare logging levels.
